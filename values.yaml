@@ -1,6 +1,7 @@
 # Default values for aws-secrets-manager-secret.
 # This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
+
+nameSuffix: "4593810"
 
 region: us-east-1
 
@@ -11,46 +12,5 @@ secret:
 
 # this chart is expected to be used with the crossplane provider for AWS Secrets Manager
 # https://marketplace.upbound.io/providers/upbound/provider-aws-secretsmanager/v1.20.1
-# and consumed via an ArgoCD Application of type helm, created via the crossplane CLI
-# crossplane provider-kubernetes Object
+# and consumed via an ArgoCD Application of type helm, created via crossplane provider-kubernetes Object
 # https://github.com/crossplane-contrib/provider-kubernetes/blob/main/examples/object/object-watching.yaml
-# like
-
-apiVersion: kubernetes.crossplane.io/v1alpha2
-kind: Object
-metadata:
-  name: foo
-  annotations:
-    uptest.upbound.io/post-assert-hook: testhooks/validate-watching.sh
-    uptest.upbound.io/timeout: "60"
-spec:
-  watch: true
-  references:
-  # Use patchesFrom to patch field from other k8s resource to object defined in .spec.forProvider.manifest 
-  - patchesFrom:
-      apiVersion: v1
-      kind: Secret
-      name: bar
-      namespace: default
-      fieldPath: data.key
-    toFieldPath: data.key-from-bar
-  forProvider:
-    manifest:
-      apiVersion: argoproj.io/v1alpha1
-      kind: Application
-      metadata:
-        name: bar
-        namespace: argocd
-      spec:
-        project: default
-        source:
-          chart: sealed-secrets
-          repoURL: https://bitnami-labs.github.io/sealed-secrets
-          targetRevision: 1.16.1
-          helm:
-            releaseName: sealed-secrets
-        destination:
-          server: "https://kubernetes.default.svc"
-          namespace: kubeseal
-  providerConfigRef:
-    name: provider-kubernetes
