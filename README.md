@@ -34,10 +34,10 @@ spec:
         source:
           chart: aws-secrets-manager-secret
           repoURL: https://baburciu.github.io/aws-secrets-manager-secret/
-          targetRevision: 0.1.0
+          targetRevision: 0.2.0
           helm:
             valuesObject:
-              fullnameOverride: eks/bar/cert
+              fullnameOverride: ekscert
               region: us-east-1
               secret:
                 key: key
@@ -104,5 +104,5 @@ spec:
   source:
     chart: aws-secrets-manager-secret
     repoURL: https://baburciu.github.io/aws-secrets-manager-secret/
-    targetRevision: 0.1.0
+    targetRevision: 0.2.0
 ```
