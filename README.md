@@ -33,11 +33,11 @@ spec:
         project: default
         source:
           chart: aws-secrets-manager-secret
-          repoURL: https://github.com/baburciu/aws-secrets-manager-secret/raw/main/
+          repoURL: https://baburciu.github.io/aws-secrets-manager-secret/
           targetRevision: 0.1.0
           helm:
-            releaseName: bar
             valuesObject:
+              fullnameOverride: eks/bar/cert
               region: us-east-1
               secret:
                 key: key
@@ -96,6 +96,6 @@ spec:
   project: default
   source:
     chart: aws-secrets-manager-secret
-    repoURL: https://github.com/baburciu/aws-secrets-manager-secret/raw/main/
+    repoURL: https://baburciu.github.io/aws-secrets-manager-secret/
     targetRevision: 0.1.0
 ```

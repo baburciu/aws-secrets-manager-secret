@@ -11,10 +11,10 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 If release name contains chart name it will be used as a full name.
 */}}
 {{- define "aws-secrets-manager-secret.fullname" -}}
-{{- if .Values.fullnameOverride }}
-{{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
-{{- else }}
 {{- $baseName := "" -}}
+{{- if .Values.fullnameOverride }}
+{{- $baseName = .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
+{{- else }}
 {{- $name := default .Chart.Name .Values.nameOverride }}
 {{- if contains $name .Release.Name }}
 {{- $baseName = .Release.Name | trunc 63 | trimSuffix "-" }}
