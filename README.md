@@ -44,8 +44,15 @@ spec:
                 name: bar
                 namespace: default
         destination:
-          server: "https://kubernetes.default.svc"
+          server: https://kubernetes.default.svc
           namespace: default
+        syncPolicy:
+          automated:
+            prune: true
+            selfHeal: true
+          syncOptions:
+            - CreateNamespace=true
+            - RespectIgnoreDifferences=true
   providerConfigRef:
     name: provider-kubernetes
 ---

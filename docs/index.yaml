@@ -3,12 +3,12 @@ entries:
   aws-secrets-manager-secret:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2025-03-05T01:08:59.172727856+02:00"
+    created: "2025-03-05T01:31:43.99053224+02:00"
     description: A Helm chart for Kubernetes
-    digest: a27026a73d9c5501f59582ff2f858d9dd9d2f8c7ba1de9b597394f2121c788ab
+    digest: 39b389510b58133a03fa597144fb90f1d96bc0fa18a1cc3559bfc18deb87228f
     name: aws-secrets-manager-secret
     type: application
     urls:
     - https://baburciu.github.io/aws-secrets-manager-secret/aws-secrets-manager-secret-0.1.0.tgz
     version: 0.1.0
-generated: "2025-03-05T01:08:59.171775637+02:00"
+generated: "2025-03-05T01:31:43.9893725+02:00"
