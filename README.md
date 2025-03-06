@@ -34,7 +34,7 @@ spec:
         source:
           chart: aws-secrets-manager-secret
           repoURL: https://baburciu.github.io/aws-secrets-manager-secret/
-          targetRevision: 0.2.0
+          targetRevision: 0.2.2
           helm:
             valuesObject:
               fullnameOverride: ekscert
@@ -64,6 +64,65 @@ metadata:
 stringData:
   key: some-value
 ```
+With this applied
+```shell
+$ kg object.kubernetes.crossplane.io/bar-aws-secrets-manager-secret -n default
+NAME                             KIND          PROVIDERCONFIG        SYNCED   READY   AGE
+bar-aws-secrets-manager-secret   Application   provider-kubernetes   True     True    9s
+ $ kg application bar-aws-secrets-manager-secret -n argocd
+NAME                             SYNC STATUS   HEALTH STATUS
+bar-aws-secrets-manager-secret   Synced        Healthy
+ $ kg application bar-aws-secrets-manager-secret -n argocd -o yaml | yq .status.resources
+- group: secretsmanager.aws.upbound.io
+  kind: Secret
+  name: eks-cert-4623913
+  status: Synced
+  syncWave: 5
+  version: v1beta1
+- group: secretsmanager.aws.upbound.io
+  kind: SecretVersion
+  name: eks-cert-4623913
+  status: Synced
+  syncWave: -10
+  version: v1beta1
+ $ kvs bar -n default
+key='some-value'
+ $ kg secret bar -n default -o yaml | yq .metadata.resourceVersion
+4623913
+ $ echo some-value-changed-again-to-secret | base64
+c29tZS12YWx1ZS1jaGFuZ2VkLWFnYWluLXRvLXNlY3JldAo=
+ $ k edit secret bar -n default     # have changed the contents of the secret, like cert-manager would
+secret/bar edited
+ $ kvs bar -n default
+key='some-value-changed-again-to-secret'
+ $ kg secret bar -n default -o yaml | yq .metadata.resourceVersion
+4624318
+ $ kg application bar-aws-secrets-manager-secret -n argocd -o yaml | yq .status.resources
+- group: secretsmanager.aws.upbound.io
+  health:
+    status: Missing
+  kind: Secret
+  name: eks-cert-4624318
+  status: OutOfSync
+  syncWave: 5
+  version: v1beta1
+- group: secretsmanager.aws.upbound.io
+  health:
+    message: Pending deletion
+    status: Progressing
+  kind: SecretVersion
+  name: eks-cert-4623913
+  requiresPruning: true
+  status: OutOfSync
+  version: v1beta1
+- group: secretsmanager.aws.upbound.io
+  kind: SecretVersion
+  name: eks-cert-4624318
+  status: Synced
+  syncWave: -10
+  version: v1beta1
+ $
+```
 
 ## Pushing chart
 
@@ -77,6 +136,7 @@ mkdir docs
 
 # Package chart to docs folder
 helm package . --destination docs
+### Successfully packaged chart and saved it to: docs/aws-secrets-manager-secret-0.2.2.tgz
 
 # Create index file
 helm repo index docs --url https://baburciu.github.io/aws-secrets-manager-secret/
@@ -87,6 +147,7 @@ helm repo index docs --url https://baburciu.github.io/aws-secrets-manager-secret
 
 # Commit and push
 git add docs
+### $ git add -f docs/aws-secrets-manager-secret-0.2.2.tg
 git commit -m "Add Helm chart package"
 git push
 
@@ -104,5 +165,5 @@ spec:
   source:
     chart: aws-secrets-manager-secret
     repoURL: https://baburciu.github.io/aws-secrets-manager-secret/
-    targetRevision: 0.2.0
+    targetRevision: 0.2.2
 ```
