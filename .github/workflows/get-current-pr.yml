@@ -1,0 +1,64 @@
+name: Workflow called to find details of the PR being merged
+on:
+  workflow_call:
+    inputs:
+      dockerfile:
+        required: false
+        type: string
+        default: Dockerfile
+      target:
+        required: false
+        type: string
+      ref:
+        required: false
+        type: string
+        default: master
+      github_user:
+        required: false
+        type: string
+        default: fm-cicd
+      skip_build:
+        required: false
+        type: boolean
+        default: false
+    # outputs:
+    #   image:
+    #     description: The resulting image
+    #     value: ${{ jobs.build.outputs.image }}
+    secrets: {}
+env:
+  DOCKER_BUILDKIT: 1
+jobs:
+  build:
+    if: ${{ !inputs.skip_build }}
+    runs-on: [ubuntu-latest]
+    timeout-minutes: 60
+    steps:
+      - name: get current merged PR
+        uses: 8BitJonny/gh-get-current-pr@3.0.0
+        if: ${{ inputs.ref == 'master' }}
+        id: PR
+
+      - name: "Pull Request ${{ steps.PR.outputs.number }}"
+        if: steps.PR.outputs.pr_found == 'true'
+        run: |
+          echo "MERGED_PR_BRANCH=${{ fromJSON(steps.PR.outputs.pr).head.ref }}" >> $GITHUB_ENV
+          echo "MERGED_PR_LAST_COMMIT=${{ fromJSON(steps.PR.outputs.pr).head.sha }}" >> $GITHUB_ENV
+
+      - name: get git variables and cache image
+        run: |
+          set -euo pipefail
+
+          if [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/master" ]]; then
+            if [[ -n "${{ env.MERGED_PR_BRANCH }}" && -n "${{ env.MERGED_PR_LAST_COMMIT }}" ]]; then
+              # PR info is available
+              MERGED_PR_BRANCH_SLUG=$(echo ${{ env.MERGED_PR_BRANCH }} | sed -r s/[~\^]+//g | sed -r s/[^a-zA-Z0-9]+/-/g | sed -r s/^-+\|-+$//g | tr A-Z a-z)
+            fi
+          fi
+
+      - name: generate report
+        run: |
+          echo "# Values" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "\`${{ env.MERGED_PR_BRANCH }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "\`${{ env.MERGED_PR_LAST_COMMIT }}\`" >> $GITHUB_STEP_SUMMARY

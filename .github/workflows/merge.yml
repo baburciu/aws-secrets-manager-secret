@@ -1,0 +1,15 @@
+name: demo-application merge action
+
+on:
+  push:
+    branches:
+      - master
+
+concurrency:
+  group: master-only
+  cancel-in-progress: false
+
+jobs:
+  production_build:
+    uses: ./.github/workflows/get-current-pr.yml
+    secrets: inherit
