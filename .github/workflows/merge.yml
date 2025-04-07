@@ -14,4 +14,4 @@ jobs:
     uses: ./.github/workflows/get-current-pr.yml
     secrets: inherit
     with:
-      ref: ${{ github.event.head }}
+      ref: ${{ github.event.head }} # will be null for PR merge to master events
