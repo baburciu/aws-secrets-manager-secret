@@ -13,3 +13,5 @@ jobs:
   get_pr_info:
     uses: ./.github/workflows/get-current-pr.yml
     secrets: inherit
+    with:
+      ref: ${{ github.event.head }}
