@@ -1,0 +1,8 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "aws-secrets-manager-secret.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+data:
+  HELM_RELEASE_NAMESPACE: {{ .Release.Namespace }}
